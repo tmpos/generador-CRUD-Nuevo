@@ -1,2 +1,2 @@
-# generador-CRUD-Nuevo
-Generador nuevo
+# Electron-base
+ Sistema Vristo en Electron

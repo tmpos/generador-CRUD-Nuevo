@@ -1,0 +1,139 @@
+{
+  "name": "GeneradorCRUD",
+  "version": "2.0.0",
+  "description": "Sistema Generador de CRUD",
+  "main": "./out/main/index.js",
+  "author": "Tomas Taveras",
+  "homepage": "https://tmposrd.com",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "start": "electron-vite preview",
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:linux": "npm run build && electron-builder --linux"
+  },
+  "dependencies": {
+    "@bhplugin/vue3-datatable": "^2.0.0",
+    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/utils": "^3.0.0",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
+    "@fullcalendar/vue3": "^6.1.15",
+    "@headlessui/vue": "^1.7.23",
+    "@intlify/vite-plugin-vue-i18n": "^7.0.0",
+    "@primevue/auto-import-resolver": "^4.1.0",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@suadelabs/vue3-multiselect": "^1.0.2",
+    "@tailwindcss/forms": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.15",
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "@vueuse/head": "^2.0.0",
+    "autoprefixer": "^10.4.20",
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
+    "chart.js": "^4.4.7",
+    "crypto-js": "^4.2.0",
+    "electron-updater": "^6.1.7",
+    "i18n": "^0.15.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.3",
+    "maska": "^3.0.3",
+    "pinia": "^2.2.4",
+    "postcss": "^8.4.47",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.1.0",
+    "qrcode": "^1.5.4",
+    "sweetalert2": "^11.14.2",
+    "tailwindcss": "^3.4.13",
+    "unplugin-vue-components": "^0.27.4",
+    "vite-plugin-pwa": "^0.20.5",
+    "vue": "^3.5.13",
+    "vue-draggable-next": "^2.2.1",
+    "vue-flatpickr-component": "^11.0.5",
+    "vue-height-collapsible": "^0.1.1",
+    "vue-i18n": "^10.0.4",
+    "vue-router": "^4.4.5",
+    "vue3-apexcharts": "^1.7.0",
+    "vue3-form-wizard": "^0.2.4",
+    "vue3-json-excel": "^1.0.10-alpha",
+    "vue3-perfect-scrollbar": "^1.6.0",
+    "vue3-popper": "^1.5.0",
+    "workbox-window": "^7.1.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config": "^1.0.2",
+    "@electron-toolkit/eslint-config-ts": "^2.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@rushstack/eslint-patch": "^1.10.3",
+    "@types/node": "^20.14.8",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "electron": "^31.0.2",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.26.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.3.1",
+    "vue-tsc": "^2.1.6"
+  },
+  "build": {
+    "appId": "com.tmpos.tmpos",
+    "productName": "GeneradorCRUD",
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "resources/**/*",
+      "out/**/*",
+      "main.js",
+      "package.json",
+      "src/renderer/public/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/",
+        "to": "resources/",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "resources/config.json",
+        "to": "config.json"
+      }
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://actualizaciones.tmposrd.com/crud/windows/"
+      }
+    ]
+  }
+}
