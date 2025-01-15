@@ -1,0 +1,22 @@
+******************************************************
+************|- INICIO DE LA PARTE DEL MENU -|********
+******************************************************
+{
+"label": "Menu_aplicacion",
+"to": "/menu_aplicacion",
+"icon": "fas icon-circle-empty"
+},
+************|-FIN DE LA PARTE DEL MENU -|********
+******************************************************
+************|- INICIO DE LA PARTE DEL ROUTER -|********
+******************************************************
+    {
+        path: '/menu_aplicacion',
+        name: 'menu_aplicacion',
+        component: () => import('../views/Menu_aplicacion/Menu_aplicacion.vue'),
+    },
+******************************************************
+************|-FIN DE LA PARTE DEL ROUTER -|********
+**********************|-CAMPOS-|******************
+"id, label, orden, icon, tipo, parent, link, permiso, created_at, updated_at, usuario"
+******************************************************

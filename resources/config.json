@@ -1,0 +1,35 @@
+{
+  "VITE_LINKURL": "https://crud.tmposrd.com",
+  "VITE_LINK_API": "/api2",
+  "VITE_LINK_UPDATE": "https://actualizacion.tmposrd.com",
+  "VITE_TOKEN": "1234567890abc",
+  "VITE_TOKEN_CORTO": "1234",
+  "VITE_PATRON_TELEFONO": "+54(###) ###-####",
+  "VITE_PATRON_CEDULA": "###-#######-#",
+  "VITE_THEME": "materia",
+  "VITE_IMPRESORA_LOCAL": "http://printer.test",
+  "impresora": {
+    "preview": false,
+    "width": "80000",
+    "height": "295000",
+    "margin": "0 0 0 0",
+    "copies": 1,
+    "silent": true,
+    "printerName": "POS80",
+    "timeOutPerLine": 1000
+  },
+  "impresoraLabel": {
+    "preview": false,
+    "width": "50800",
+    "height": "76200",
+    "margin": "0 0 0 0",
+    "copies": 1,
+    "silent": true,
+    "printerName": "4BARCODE",
+    "timeOutPerLine": 1000
+  },
+  "VITE_ID_EMPRESA": "1",
+  "VITE_UPDATE": "false",
+  "VITE_PRODUCTION": "false",
+  "VITE_CAJERO_ACTIVO": "true"
+}

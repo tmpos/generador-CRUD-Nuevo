@@ -1,0 +1,9 @@
+@import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css';
+@import '@bhplugin/vue3-datatable/dist/style.css';
+@import 'datatable.css';
+@import 'sweetalert.css';
+@import 'select2.css';
+@import 'tailwind.css';
+/*body {
+    @apply scrollbar-thin scrollbar-thumb-primary scrollbar-track-gray-100;
+}*/
