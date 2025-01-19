@@ -1,7 +1,7 @@
 <template>
   <div class="wizard-container">
     <form-wizard @on-complete="generateFiles" color="#4361ee" class="circle">
-      
+
       <!-- Step 1: Información del Servidor -->
       <tab-content title="Paso 1: Información del Servidor" customIcon='<i class="pi pi-server"></i>'>
         <fieldset class="border p-3 round mb-2">
@@ -10,7 +10,7 @@
 
             <div class="form-group col-span-4">
               <label>Nombre de la Tabla</label>
-              <input type="text" placeholder="Tabla" v-model="formData.tableName" class="form-input" />
+              <input type="text" placeholder="Tabla" v-minuscula v-model="formData.tableName" class="form-input" />
             </div>
             <div class="form-group col-span-4">
               <label>Tipo de Tabla</label>
@@ -21,7 +21,7 @@
             </div>
             <div class="form-group col-span-4">
               <label>Ícono</label>
-              <input type="text" placeholder="icon-circle-empty" v-model="formData.icon" class="form-input" />
+              <input type="text"  placeholder="icon-circle-empty" v-model="formData.icon" class="form-input" />
             </div>
             <div class="grid grid-cols-12 gap-4 col-span-12">
               <div class="col-span-3 flex items-center" v-for="(label, key) in buttonLabels" :key="key">
@@ -32,7 +32,17 @@
                 <span class="ml-2">{{ label }}</span>
               </div>
             </div>
-            <div class="form-group col-span-12">
+            <div class="form-group col-span-6">
+              <label>Directorio</label>
+
+    <div class="flex gap-2">
+      <input type="text" v-model="formData.directorio" placeholder="Directorio seleccionado..." class="form-input" readonly />
+      <input type="file" webkitdirectory directory multiple @change="selectDirectory" class="hidden" ref="fileInput" />
+      <button type="button" @click="openFileDialog" class="btn btn-primary">Seleccionar</button>
+    </div>
+
+            </div>
+            <div class="form-group col-span-6">
               <label>From API</label>
 
           <div class="flex">
@@ -41,6 +51,7 @@
           </div>
 
             </div>
+
           </div>
         </fieldset>
       </tab-content>
@@ -199,7 +210,8 @@
 
               <div class="col-span-4">
                 <label class="block mb-1 font-medium">Asignación</label>
-                <select v-model="currentField.assignment" @change="fnAsignacion" class="w-full form-select">
+                    <div class="flex">
+                <select v-model="currentField.assignment" @change="fnAsignacion" class="w-full form-select ltr:rounded-r-none rtl:rounded-l-none">
                   <option value="no">NO</option>
                    <option value="selectpicker">SELECT PICKER</option>
                   <option value="timepicker">TIMEPICKER</option>
@@ -214,6 +226,9 @@
                   <option value="soloNumero">SOLO NUMERO</option>
                   <option value="soloLetra">SOLO LETRA</option>
                 </select>
+                  <button type="button" @click="fnLimpiarAsisgnacion" class="btn btn-secondary ltr:rounded-l-none rtl:rounded-r-none">Borrar</button>
+                </div>
+
               </div>
 
               <div class="col-span-3">
@@ -341,7 +356,7 @@
               </button>
               <div class="text-lg font-bold bg-[#fbfbfb] dark:bg-[#121c2c] ltr:pl-5 rtl:pr-5 py-3 ltr:pr-[50px] rtl:pl-[50px]">FromJSON</div>
               <div class="p-5">
-                
+
                 <form>
                     <div>
                       <label for="camposjson">CAMPOS -- OBJETO || ARRAY</label>
@@ -396,6 +411,15 @@ import {
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 /*********************************************************************/
+const addFieldFromJSONmodal = ref(false)
+/*********************************************************************/
+watchEffect(()=>{
+  if(addFieldFromJSONmodal.value){
+     camposModal.value = ''
+  }
+
+})
+/*********************************************************************/
 const link = ref('');
 const api = ref('');
 const token = ref('');
@@ -405,13 +429,17 @@ const patroncedula = ref('');
 const tokenCifrado = ref('');
 
 /*********************************************************************/
-const addFieldFromJSONmodal = ref(false)
 const camposModal = ref('')
 /*********************************************************************/
 const camposGenerar = (campos)=>{
   for(let campo of campos){
     formData.value.fields.push({ name: campo.nombre, visible: true });
   }
+}
+/*********************************************************************/
+const fnLimpiarAsisgnacion = ()=>{
+   currentField.value.attributes = '';
+   currentField.value.assignment = 'no'
 }
 /*********************************************************************/
 const fnCamposModal = () => {
@@ -427,7 +455,7 @@ const fnCamposModal = () => {
 
 
     const tipoCampos = typeof camposN;
- 
+
     // Generar campos según el tipo de la estructura
     if (tipoCampos === 'object' && !Array.isArray(camposN)) {
       // Si es un objeto, tomar las propiedades
@@ -451,6 +479,7 @@ const fnCamposModal = () => {
           valor: item
         }));
         camposGenerar(campos)
+        addFieldFromJSONmodal.value = false
       }
     } else {
       console.error("El tipo de datos no es soportado");
@@ -468,6 +497,7 @@ const formData = ref({
   apiUrl: '',
   tableType: 'DataTable',
   icon: '',
+  directorio: '',
   newButton: true,
   updateButton: true,
   deleteButton: true,
@@ -487,7 +517,26 @@ const formData = ref({
   },
 });
 
+/*******************************************************************/
+const fileInput = ref(null);
 
+// Abre el selector de archivos oculto
+const openFileDialog = () => {
+  fileInput.value.click();
+};
+
+
+function selectDirectory(event) {
+  const files = event.target.files;
+  if (files.length > 0) {
+    // Extraer el directorio base desde el path del primer archivo
+    const fullPath = files[0].path;
+    const directory = fullPath.substring(0, fullPath.lastIndexOf("\\"));
+    formData.value.directorio = directory;
+
+  }
+}
+/*******************************************************************/
 
 onMounted(async() => {
 
@@ -505,6 +554,9 @@ tokenCifrado.value = await encryptarPassword(token.value, 10);
   if (savedData) {
     formData.value = JSON.parse(savedData);
   }
+
+
+
 });
 
 
@@ -603,7 +655,7 @@ function clearFields() {
 function addField() {
   const newField = { name: `Field ${formData.value.fields.length}`, visible: true };
   formData.value.fields.push(newField);
-  const newIndex = formData.value.fields.length - 1; 
+  const newIndex = formData.value.fields.length - 1;
   editField(newIndex);
 }
 
@@ -617,7 +669,7 @@ function onMove(event) {
     return false;
   }
 
-  return true; 
+  return true;
 }
 
 
@@ -688,6 +740,9 @@ const currentFieldOptions = ref({
   ]
 });
 
+
+//currentField.properties
+//currentFieldOptions
 // Modifica la función fnCambioTipoFront para actualizar las opciones de currentField.properties
 function fnCambioTipoFront() {
   if (currentField.value.frontType === 'inputgroup') {
@@ -697,6 +752,8 @@ function fnCambioTipoFront() {
       { value: 'append', label: 'Append' },
       { value: 'both', label: 'Both' }
     ];
+  }else if(currentField.value.frontType === 'input'){
+     currentField.value.properties = 'text'
   } else {
     currentField.value.properties = ''; // Reinicia el valor seleccionado
     currentFieldOptions.value.properties = [
@@ -781,8 +838,8 @@ const generateFormulario = async()=>{
   await Swal.fire({
     title: "Generated Modal Code",
     html: `
-      <textarea 
-        readonly 
+      <textarea
+        readonly
         style="width: 100%; height: 200px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; font-family: monospace;"
       >${envio.formulario}</textarea>
     `,
@@ -842,8 +899,8 @@ const generateFormularioPrimeVue = async()=>{
   await Swal.fire({
     title: "Generated Modal Code",
     html: `
-      <textarea 
-        readonly 
+      <textarea
+        readonly
         style="width: 100%; height: 200px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; font-family: monospace;"
       >${envio.formulario}</textarea>
     `,

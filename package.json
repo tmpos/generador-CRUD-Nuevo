@@ -1,6 +1,6 @@
 {
   "name": "GeneradorCRUD",
-  "version": "2.0.0",
+  "version": "2.7.0",
   "description": "Sistema Generador de CRUD",
   "main": "./out/main/index.js",
   "author": "Tomas Taveras",
@@ -43,6 +43,7 @@
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.7",
     "crypto-js": "^4.2.0",
+    "electron-log": "^5.2.4",
     "electron-updater": "^6.1.7",
     "i18n": "^0.15.1",
     "jspdf": "^2.5.2",
@@ -112,6 +113,13 @@
         ]
       },
       {
+        "from": "resources/assets/",
+        "to": "../assets/",
+        "filter": [
+          "**/*"
+        ]
+      },
+        {
         "from": "resources/config.json",
         "to": "config.json"
       }

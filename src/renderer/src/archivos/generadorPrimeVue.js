@@ -99,7 +99,7 @@ const camposCrear = datosJSON.fields
                   </div>`;
             }else if(field.frontType === 'timepicker'){
         return `<div class="${tamano}">
-                    <label class="font-bold block mb-2" for="${field.name}">${field.name.toUpperCase()}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400" for="${field.name}">${field.name.toUpperCase()}</label>
                    <DatePicker  v-model="datoscampos${capitalizeFirstLetter(datosJSON.tableName)}.${field.name}" timeOnly fluid />
             </div>`;
             }else if(field.frontType === 'checkbox'){

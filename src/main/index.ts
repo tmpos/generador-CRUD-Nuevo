@@ -1,5 +1,5 @@
   // @ts-nocheck
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+const { app, shell, BrowserWindow, ipcMain, dialog } = require('electron');
 import { join } from 'path';
 import * as path from 'path'
 import os from 'os';
@@ -7,6 +7,13 @@ const { exec } = require('child_process');
 import fs from 'fs/promises';
 import { optimizer, is } from '@electron-toolkit/utils'; 
 import icon from '../../resources/icon.png?asset';
+const { autoUpdater } = require('electron-updater');
+
+autoUpdater.logger = require('electron-log');
+autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.autoDownload = true;
+
+
 import { generadorPrimeVue } from '../../src/renderer/src/archivos/generadorPrimeVue.js';
 import { generadorVue } from '../../src/renderer/src/archivos/generadorVueVristo.js';
 import { generadorVueCrear } from '../../src/renderer/src/archivos/generadorVueVristoCrear.js';
@@ -24,6 +31,77 @@ import { generadorVuePlantillaPrimeVue } from '../../src/renderer/src/archivos/g
 import { generadorFromularioVristo } from '../../src/renderer/src/archivos/generadorFormularioVristo.js';
 import { generadorFromularioPrimeVue } from '../../src/renderer/src/archivos/generadorFormularioPrimeVue.js';
 
+/**************************************************************/
+// Función para cerrar la aplicación y eliminar procesos
+function closeAppAndKillProcesses() {
+  return new Promise((resolve, reject) => {
+    exec('taskkill /F /IM GeneradorCRUD.exe', (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        reject(`stderr: ${stderr}`);
+        return;
+      }
+      resolve(`stdout: ${stdout}`);
+    });
+  });
+}
+
+/**************************************************************/
+function handleUpdates() {
+  autoUpdater.checkForUpdates();
+
+  autoUpdater.on('update-available', (info) => {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'Actualización disponible',
+      message: 'Hay una nueva versión disponible. ¿Deseas descargarla ahora?',
+      buttons: ['Sí', 'No']
+    }).then((result) => {
+      if (result.response === 0) {
+        autoUpdater.downloadUpdate();
+      }
+    });
+  });
+/**************************************************************/
+  autoUpdater.on('update-not-available', (info) => {
+    dialog.showMessageBox({
+      title: 'No hay actualizaciones',
+      message: 'Tienes la última versión instalada.'
+    });
+  });
+
+/**************************************************************/
+    autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    mainWindow.webContents.send('download-progress', progressObj);
+  });
+/**************************************************************/
+      autoUpdater.on('update-downloaded', (info) => {
+    dialog.showMessageBox({
+      title: 'Actualización descargada',
+      message: 'La actualización ha sido descargada. La aplicación se cerrará para instalar la actualización.'
+    }).then(() => {
+      closeAppAndKillProcesses().then(() => {
+        autoUpdater.quitAndInstall();
+      }).catch((error) => {
+        console.error('Error al cerrar la aplicación y eliminar procesos:', error);
+      });
+    });
+  });
+/**************************************************************/
+        autoUpdater.on('error', (err) => {
+    dialog.showMessageBox({
+      title: 'Error',
+      message: 'Hubo un error al actualizar la aplicación.'
+    });
+    console.error('Error al actualizar la aplicación:', err);
+  });
+}
 /**************************************************************/
 async function loadConfig() {
   const userDataPath = app.getPath('userData')
@@ -245,20 +323,22 @@ async function guardarArchivoVue(datos) {
             throw new Error("El nombre del menú no está definido o no es una cadena válida.");
         }
 
-
-        //generadorVuePlantillaVristo(datosJSON)
-
-        if(datosJSON.useNodejs){
-            const retorno = await guardarArchivoVueVristo(datosJSON)
-            return retorno;
+        // Determinar el directorio de destino
+        let destinationPath;
+        if (datosJSON.directorio && datosJSON.directorio.trim() !== "") {
+            destinationPath = datosJSON.directorio+'/'+capitalizeFirstLetter(datosJSON.tableName); // Usar directorio proporcionado
+        } else {
+            destinationPath = join(os.homedir(), 'Downloads', capitalizeFirstLetter(datosJSON.tableName)); // Usar Downloads por defecto
         }
 
-        // Crear directorio de destino
-        const downloadsPath = join(os.homedir(), 'Downloads', capitalizeFirstLetter(datosJSON.tableName));
-        await fs.mkdir(downloadsPath, { recursive: true });
-        
+        console.log("Directorio de destino:", destinationPath);
+
+        // Crear directorio si no existe
+        await fs.mkdir(destinationPath, { recursive: true });
+
+        // Generar plantilla de campos
         const plantillaCampos = await generadorVueCampos(datosJSON);
-        const filePathCampos = join(downloadsPath, `${capitalizeFirstLetter(datosJSON.tableName)}.txt`);
+        const filePathCampos = join(destinationPath, `${capitalizeFirstLetter(datosJSON.tableName)}.txt`);
         await fs.writeFile(filePathCampos, plantillaCampos, 'utf8');
 
         if (!datosJSON.useModal) {
@@ -268,9 +348,9 @@ async function guardarArchivoVue(datos) {
             const plantillaActualizar = await generadorPrimeVueActualizar(datosJSON);
 
             // Definir rutas para los archivos
-            const filePathLeer = join(downloadsPath, `${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
-            const filePathCrear = join(downloadsPath, `Crear${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
-            const filePathActualizar = join(downloadsPath, `Editar${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
+            const filePathLeer = join(destinationPath, `${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
+            const filePathCrear = join(destinationPath, `Crear${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
+            const filePathActualizar = join(destinationPath, `Editar${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
 
             // Escribir archivos
             await fs.writeFile(filePathLeer, plantillaLeer, 'utf8');
@@ -286,13 +366,12 @@ async function guardarArchivoVue(datos) {
                 }
             };
         } else {
-            const filePath = join(downloadsPath, `${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
+            const filePath = join(destinationPath, `${capitalizeFirstLetter(datosJSON.tableName)}.vue`);
             let plantilla;
-            if(datosJSON.usePrime){
-               plantilla = await generadorPrimeVue(datosJSON);
-            }else if(datosJSON.useNodejs){
-               plantilla = await generadorVue(datosJSON);
-
+            if (datosJSON.usePrime) {
+                plantilla = await generadorPrimeVue(datosJSON);
+            } else if (datosJSON.useNodejs) {
+                plantilla = await generadorVue(datosJSON);
             }
 
             await fs.writeFile(filePath, plantilla, 'utf8');
@@ -305,8 +384,9 @@ async function guardarArchivoVue(datos) {
 }
 
 /************************************************************************/
+let mainWindow;
 function createWindow() {
-    const mainWindow = new BrowserWindow({
+        mainWindow = new BrowserWindow({
         width: 900,
         height: 670,
         show: false,
@@ -332,14 +412,17 @@ function createWindow() {
     } else {
         mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
     }
+
+handleUpdates();
+
 }
 
 // Manejador para guardar el archivo Vue desde el renderer
+/**********************************************************************/
 ipcMain.handle('datosjson', async (event, datosJSON) => {
     return await guardarArchivoVue(datosJSON);
 });
-
-
+/**********************************************************************/
 ipcMain.handle('plantillaVristo', async (event, datosJSON) => {
     return await plantillaVueVristo(datosJSON);
 });

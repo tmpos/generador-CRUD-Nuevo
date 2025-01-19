@@ -20,16 +20,16 @@
                 <div class="ltr:mr-2 rtl:ml-2 hidden sm:block">
                     <ul class="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                           <li>
-                            <router-link to="/vender"
+                            <router-link to="/crud"
                                 class="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                <i class="p-1 pi pi-cart-arrow-down"></i>
+                                <i class="p-1 pi pi-cog"></i>
                             </router-link>
 
                         </li> 
                           <li>
-                            <router-link to="/reparation"
+                            <router-link to="/primevue"
                                 class="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                <i class="p-1 pi pi-wrench"></i>
+                                <i class="p-1 pi pi-folder-plus"></i>
                             </router-link>
 
                         </li> 
@@ -42,27 +42,27 @@
                             class="sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block hidden"
                             :class="{ '!block': search }" @submit.prevent="search = false">
                             <div class="relative">
-                                <input type="text"
+<!--                                 <input type="text"
                                     class="form-input ltr:pl-9 rtl:pr-9 ltr:sm:pr-4 rtl:sm:pl-4 ltr:pr-9 rtl:pl-9 peer sm:bg-transparent bg-gray-100 placeholder:tracking-widest"
-                                    placeholder="Search..." />
-                                <button type="button"
+                                    placeholder="Search..." /> -->
+<!--                                 <button type="button"
                                     class="absolute w-9 h-9 inset-0 ltr:right-auto rtl:left-auto appearance-none peer-focus:text-primary">
                                     <i class=" m-auto pi pi-search mx-auto"></i>
-                                </button>
-                                <button type="button"
+                                </button> -->
+<!--                                 <button type="button"
                                     class="hover:opacity-80 sm:hidden block absolute top-1/2 -translate-y-1/2 ltr:right-2 rtl:left-2"
                                     @click="search = false">
 
                                     <i class="pi pi-times-circle"></i>
-                                </button>
+                                </button> -->
                             </div>
                         </form>
 
-                        <button type="button"
+<!--                         <button type="button"
                             class="search_btn sm:hidden p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:bg-white-light/90 dark:hover:bg-dark/60"
                             @click="search = !search">
                             <i class=" m-auto pi pi-search w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]"></i>
-                        </button>
+                        </button> -->
                     </div>
                     <div>
                         <a href="javascript:;" v-show="store.theme === 'light'"
@@ -110,86 +110,9 @@
                         </Popper>
                     </div>
 
-                    <router-link to="/calendar"
-                                class="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
-                        <i class="p-1 pi pi-calendar"></i>
-                    </router-link>
-                       
-                    <div class="dropdown shrink-0">
-                        <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'"
-                            offsetDistance="8">
-                            <button type="button"
-                                class="relative block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
-                                <i class="p-1 pi pi-bell"></i>
 
-                                <span class="flex absolute w-3 h-3 ltr:right-0 rtl:left-0 top-0">
-                                    <span
-                                        class="animate-ping absolute ltr:-left-[3px] rtl:-right-[3px] -top-[3px] inline-flex h-full w-full rounded-full bg-success/50 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full w-[6px] h-[6px] bg-success"></span>
-                                </span>
-                            </button>
-                            <template #content="{ close }">
-                                <ul
-                                    class="!py-0 text-dark dark:text-white-dark w-[300px] sm:w-[350px] divide-y dark:divide-white/10">
-                                    <li>
-                                        <div class="flex items-center px-4 py-2 justify-between font-semibold">
-                                            <h4 class="text-lg">Notification</h4>
-                                            <template v-if="notifications.length">
-                                                <span class="badge bg-primary/80"
-                                                    v-text="notifications.length + 'New'"></span>
-                                            </template>
-                                        </div>
-                                    </li>
-                                    <template v-for="notification in notifications" :key="notification.id">
-                                        <li class="dark:text-white-light/90">
-                                            <div class="group flex items-center px-4 py-2">
-                                                <div class="grid place-content-center rounded">
-                                                    <div class="w-12 h-12 relative">
-                                                        <img class="w-12 h-12 rounded-full object-cover"
-                                                            :src="`/assets/images/${notification.profile}`" alt="" />
-                                                        <span
-                                                            class="bg-success w-2 h-2 rounded-full block absolute right-[6px] bottom-0"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="ltr:pl-3 rtl:pr-3 flex flex-auto">
-                                                    <div class="ltr:pr-3 rtl:pl-3">
-                                                        <h6 v-html="notification.message"></h6>
-                                                        <span class="text-xs block font-normal dark:text-gray-500"
-                                                            v-text="notification.time"></span>
-                                                    </div>
-                                                    <button type="button"
-                                                        class="ltr:ml-auto rtl:mr-auto text-neutral-300 hover:text-danger opacity-0 group-hover:opacity-100"
-                                                        @click="removeNotification(notification.id)">
-                                                        <icon-x-circle />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </template>
-                                    <template v-if="notifications.length">
-                                        <li>
-                                            <div class="p-4">
-                                                <button class="btn btn-primary block w-full btn-small"
-                                                    @click="close()">Read All Notifications</button>
-                                            </div>
-                                        </li>
-                                    </template>
-                                    <template v-if="!notifications.length">
-                                        <li>
-                                            <div
-                                                class="!grid place-content-center hover:!bg-transparent text-lg min-h-[200px]">
-                                                <div
-                                                    class="mx-auto ring-4 ring-primary/30 rounded-full mb-4 text-primary">
-                                                    <icon-info-circle :fill="true" class="w-10 h-10" />
-                                                </div>
-                                                No data available.
-                                            </div>
-                                        </li>
-                                    </template>
-                                </ul>
-                            </template>
-                        </Popper>
-                    </div>
+                       
+                    
 
                     <div class="dropdown shrink-0">
                         <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8"
@@ -222,13 +145,7 @@
                                             Profile
                                         </router-link>
                                     </li>
-                                    <li>
-                                        <router-link to="/apps/mailbox" class="dark:hover:text-white" @click="close()">
-                                            <icon-mail class="w-4.5 h-4.5 ltr:mr-2 rtl:ml-2 shrink-0" />
 
-                                            Inbox
-                                        </router-link>
-                                    </li>
                                     <li>
                                         <router-link to="/lock" class="dark:hover:text-white"
                                             @click="close()">
